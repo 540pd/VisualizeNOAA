@@ -1,0 +1,112 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# visualizeNOAA
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+# Introduction
+  
+This vignette provides an overview of the `visualizeNOAA` package functionalities for cleaning and visualizing earthquake data from NOAA.
+
+## Installation
+
+You can install the package from GitHub using the following command:
+```{r setup}
+#devtools::install_github("apd/visualizeNOAA")
+```
+
+## Loading the Package
+Once installed, load the package into your R session:
+```{r}
+library(visualizeNOAA)
+library(tidyverse)
+library(leaflet)
+```
+
+
+## Cleaning NOAA Earthquake Data
+The eq_clean_data() function cleans the raw NOAA earthquake data. It reads the data from a tab-delimited file, creates a date column, and converts latitude and longitude to numeric class.
+```{r}
+cleaned_data <- eq_clean_data("../inst/extdata/earthquakes.tsv")
+cleaned_data %>%
+  head()
+```
+
+## Cleaning Earthquake Location Names
+The eq_location_clean() function cleans the LOCATION_NAME column by stripping out the country name and converting names to title case.
+```{r}
+cleaned_location <- eq_location_clean(cleaned_data)
+cleaned_location %>% 
+  head()
+```
+
+## Visualizing Earthquake Data
+### Timeline of Earthquakes
+The geom_timeline() function plots a timeline of earthquakes.
+```{r, fig.dim = c(6, 4)}
+df_visualize <- bind_rows(
+  cleaned_location %>%
+    head(10),
+  data.frame(country="", location ="")) %>% 
+  mutate(country=factor(country, levels = unique(country))) 
+ggplot(data = df_visualize) +
+  geom_timeline(aes(date,size = magnitude,  color = no_deaths)) +
+  theme_minimal() +
+  theme(
+    axis.line.x = element_line(linewidth = 0.75),
+    axis.title.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    legend.position = "bottom"
+  )
+
+```
+
+### Timeline of Earthquakes
+The geom_timelinelabel() function includes label as well.
+```{r, fig.dim = c(6, 4)}
+ggplot(data = df_visualize) +
+  geom_timeline(aes(date,country, size = magnitude,  color = no_deaths))  +
+  geom_timelinelabel(aes(date,country,label = location), n_max = 5) +
+  theme_minimal() +
+  theme(
+    axis.line.x = element_line(linewidth = 0.75),
+    axis.title.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    legend.position = "bottom"
+  )
+```
+
+### Visualize Earthquakes in Mexico Since 2000
+This function filters the cleaned earthquake data to include only earthquakes in Mexico since the year 2000 and visualizes them on a leaflet map. Each earthquake is represented by a circle on the map, with the circle's radius proportional to the earthquake's magnitude. The pop-up for each circle displays the date of the earthquake.
+```{r, fig.dim = c(6, 4)}
+eq_clean_data("../inst/extdata/earthquakes.tsv") %>%
+  eq_location_clean() %>%
+  filter(country=="MEXICO" & lubridate::year(date) >= 2000) %>%
+  eq_map(annot_col = "date")
+```
+
+### Visualize Earthquakes in Mexico Since 2000 with Custom Annotations
+This function filters the cleaned earthquake data to include only earthquakes in Mexico since the year 2000. It then creates custom annotations for each earthquake, including information about the location, magnitude, and total deaths. These annotations are added to the leaflet map, providing more detailed information when a user interacts with the map.
+```{r, fig.dim = c(6, 4)}
+eq_clean_data("../inst/extdata/earthquakes.tsv") %>%
+  eq_location_clean() %>%
+  filter(country=="MEXICO" & lubridate::year(date) >= 2000) %>%
+  mutate(popup_text =  eq_create_label(.)) %>%
+  eq_map(annot_col = "popup_text")
+```
