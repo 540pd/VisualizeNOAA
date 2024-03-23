@@ -21,14 +21,16 @@
 #' @export
 eq_clean_data <- function(path_of_data = "inst/extdata/earthquakes.tsv") {
   data <- read_delim(path_of_data, delim = "\t", show_col_types = FALSE)
-  names(data)<-make.names(names(data))
-  clean_data <- data%>%
-    dplyr::filter(!is.na(.data$Mo) & !is.na(.data$Dy))  %>%
-    dplyr::mutate(date = lubridate::ymd(paste(stringr::str_pad(abs(.data[["Year"]]), width = 4, side = "left", pad = "0"), .data[["Mo"]], .data[["Dy"]], sep = "-")),
-                  latitude = as.numeric(.data[["Latitude"]]),
-                  longitude = as.numeric(.data[["Longitude"]])) %>%
+  names(data) <- make.names(names(data))
+  clean_data <- data %>%
+    dplyr::filter(!is.na(.data$Mo) & !is.na(.data$Dy)) %>%
+    dplyr::mutate(
+      date = lubridate::ymd(paste(stringr::str_pad(abs(.data[["Year"]]), width = 4, side = "left", pad = "0"), .data[["Mo"]], .data[["Dy"]], sep = "-")),
+      latitude = as.numeric(.data[["Latitude"]]),
+      longitude = as.numeric(.data[["Longitude"]])
+    ) %>%
     dplyr::select("date", "latitude", "longitude", "Location.Name", "Mag", "Deaths") %>%
-    dplyr::rename("magnitude" = "Mag", "no_deaths" =  "Deaths")
+    dplyr::rename("magnitude" = "Mag", "no_deaths" = "Deaths")
   return(clean_data)
 }
 
@@ -47,8 +49,10 @@ eq_clean_data <- function(path_of_data = "inst/extdata/earthquakes.tsv") {
 eq_location_clean <- function(data_df) {
   fin_data <- data_df %>%
     tidyr::separate(.data$Location.Name, into = c("country", "location"), sep = ":", remove = FALSE, extra = "merge", fill = "right") %>%
-    dplyr::mutate(country = str_trim(.data[["country"]]),
-           location = stringr::str_to_title(stringr::str_trim(.data[["location"]]))) %>%
+    dplyr::mutate(
+      country = str_trim(.data[["country"]]),
+      location = stringr::str_to_title(stringr::str_trim(.data[["location"]]))
+    ) %>%
     dplyr::arrange(dplyr::desc(.data$date))
   return(fin_data)
 }
@@ -63,7 +67,7 @@ eq_location_clean <- function(data_df) {
 GeomTimeline <- ggplot2::ggproto(
   "GeomTimeline",
   Geom,
-  required_aes =  c("x"),
+  required_aes = c("x"),
   default_aes = aes(
     shape = 19,
     colour = "black",
@@ -76,14 +80,18 @@ GeomTimeline <- ggplot2::ggproto(
   # draw_key = draw_key_point,
   draw_panel = function(data, panel_params, coord) {
     # browser()
-    force_scale<-if(all(data$y==1)){T} else {F}
+    force_scale <- if (all(data$y == 1)) {
+      T
+    } else {
+      F
+    }
     coords <- coord$transform(data, panel_params)
-    coords$y<-if(force_scale) coords$y*0.5 else coords$y
+    coords$y <- if (force_scale) coords$y * 0.5 else coords$y
     stroke_size <- coords$stroke
     stroke_size[is.na(stroke_size)] <- 0
     grid::pointsGrob(
       coords$x,
-      coords$y ,
+      coords$y,
       pch = coords$shape,
       gp = grid::gpar(
         col = alpha(coords$colour, coords$alpha),
@@ -147,7 +155,7 @@ geom_timeline <- function(mapping = NULL,
 GeomTimelineLabel <- ggproto(
   "GeomTimelineLabel",
   Geom,
-  required_aes =  c("x", "label"),
+  required_aes = c("x", "label"),
   default_aes = aes(
     shape = 19,
     colour = "black",
@@ -159,10 +167,14 @@ GeomTimelineLabel <- ggproto(
   ),
   # draw_key = draw_key_text,
   draw_panel = function(data, panel_params, coord, n_max) {
-        force_scale<-if(all(data$y==1)){T} else {F}
+    force_scale <- if (all(data$y == 1)) {
+      T
+    } else {
+      F
+    }
 
-        coord <- coord$transform(data, panel_params)
-        coord$y<-if(force_scale) coord$y*0.5 else coord$y
+    coord <- coord$transform(data, panel_params)
+    coord$y <- if (force_scale) coord$y * 0.5 else coord$y
 
 
     coord <- coord[order(coord$size, decreasing = T)[1:n_max], ]
@@ -269,10 +281,10 @@ eq_map <- function(data, annot_col = "date", margin_plot = 0.01) {
   leaflet::leaflet(data) %>%
     leaflet::addTiles() %>%
     leaflet::fitBounds(
-      ~min(longitude, na.rm = TRUE) * (1 - margin_plot),
-      ~min(latitude, na.rm = TRUE) * (1 - margin_plot),
-      ~max(longitude, na.rm = TRUE) * (1 + margin_plot),
-      ~max(latitude, na.rm = TRUE) * (1 + margin_plot)
+      ~ min(longitude, na.rm = TRUE) * (1 - margin_plot),
+      ~ min(latitude, na.rm = TRUE) * (1 - margin_plot),
+      ~ max(longitude, na.rm = TRUE) * (1 + margin_plot),
+      ~ max(latitude, na.rm = TRUE) * (1 + margin_plot)
     ) %>%
     leaflet::addCircleMarkers(
       lng = ~longitude,
@@ -280,7 +292,7 @@ eq_map <- function(data, annot_col = "date", margin_plot = 0.01) {
       radius = ~magnitude,
       stroke = FALSE,
       fillOpacity = 0.4,
-      popup = ~get(annot_col)
+      popup = ~ get(annot_col)
     )
 }
 
@@ -310,6 +322,3 @@ eq_create_label <- function(data) {
     dplyr::mutate(annt = paste0("<b>Location: </b>", .data$location, "<br><b> Magnitude: </b>", .data$magnitude, "<br><b>Total deaths: </b>", .data$no_deaths)) %>%
     dplyr::pull(.data$annt)
 }
-
-
-

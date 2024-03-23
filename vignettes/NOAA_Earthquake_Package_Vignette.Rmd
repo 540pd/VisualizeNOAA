@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 You can install the package from GitHub using the following command:
 ```{r setup}
-#devtools::install_github("apd540/visualizeNOAA")
+# devtools::install_github("apd540/visualizeNOAA")
 ```
 
 ## Loading the Package
@@ -47,7 +47,7 @@ cleaned_data %>%
 The eq_location_clean() function cleans the LOCATION_NAME column by stripping out the country name and converting names to title case.
 ```{r}
 cleaned_location <- eq_location_clean(cleaned_data)
-cleaned_location %>% 
+cleaned_location %>%
   head()
 ```
 
@@ -58,10 +58,11 @@ The geom_timeline() function plots a timeline of earthquakes.
 df_visualize <- bind_rows(
   cleaned_location %>%
     head(10),
-  data.frame(country="", location ="")) %>% 
-  mutate(country=factor(country, levels = unique(country))) 
+  data.frame(country = "", location = "")
+) %>%
+  mutate(country = factor(country, levels = unique(country)))
 ggplot(data = df_visualize) +
-  geom_timeline(aes(date,size = magnitude,  color = no_deaths)) +
+  geom_timeline(aes(date, size = magnitude, color = no_deaths)) +
   theme_minimal() +
   theme(
     axis.line.x = element_line(linewidth = 0.75),
@@ -70,15 +71,14 @@ ggplot(data = df_visualize) +
     panel.grid.minor.x = element_blank(),
     legend.position = "bottom"
   )
-
 ```
 
 ### Timeline of Earthquakes
 The geom_timelinelabel() function includes label as well.
 ```{r, fig.dim = c(6, 4)}
 ggplot(data = df_visualize) +
-  geom_timeline(aes(date,country, size = magnitude,  color = no_deaths))  +
-  geom_timelinelabel(aes(date,country,label = location), n_max = 5) +
+  geom_timeline(aes(date, country, size = magnitude, color = no_deaths)) +
+  geom_timelinelabel(aes(date, country, label = location), n_max = 5) +
   theme_minimal() +
   theme(
     axis.line.x = element_line(linewidth = 0.75),
@@ -94,7 +94,7 @@ This function filters the cleaned earthquake data to include only earthquakes in
 ```{r, fig.dim = c(6, 4)}
 eq_clean_data("../inst/extdata/earthquakes.tsv") %>%
   eq_location_clean() %>%
-  filter(country=="MEXICO" & lubridate::year(date) >= 2000) %>%
+  filter(country == "MEXICO" & lubridate::year(date) >= 2000) %>%
   eq_map(annot_col = "date")
 ```
 
@@ -103,7 +103,7 @@ This function filters the cleaned earthquake data to include only earthquakes in
 ```{r, fig.dim = c(6, 4)}
 eq_clean_data("../inst/extdata/earthquakes.tsv") %>%
   eq_location_clean() %>%
-  filter(country=="MEXICO" & lubridate::year(date) >= 2000) %>%
-  mutate(popup_text =  eq_create_label(.)) %>%
+  filter(country == "MEXICO" & lubridate::year(date) >= 2000) %>%
+  mutate(popup_text = eq_create_label(.)) %>%
   eq_map(annot_col = "popup_text")
 ```
