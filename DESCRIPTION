@@ -18,8 +18,7 @@ Imports:
     tidyr,
     magrittr,
     stringr,
-    rlang,
-    tidyverse
+    rlang
 Suggests: 
     knitr,
     rmarkdown,
