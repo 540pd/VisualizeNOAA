@@ -109,15 +109,18 @@ ggplot(data = df_visualize) +
 
 ### Visualize Earthquakes in Mexico Since 2000
 This function filters the cleaned earthquake data to include only earthquakes in Mexico since the year 2000 and visualizes them on a leaflet map. Each earthquake is represented by a circle on the map, with the circle's radius proportional to the earthquake's magnitude. The pop-up for each circle displays the date of the earthquake.
+```
 eq_clean_data("../inst/extdata/earthquakes.tsv") %>%
   eq_location_clean() %>%
   filter(country=="MEXICO" & lubridate::year(date) >= 2000) %>%
   eq_map(annot_col = "date")
+```
 
 ### Visualize Earthquakes in Mexico Since 2000 with Custom Annotations
 This function filters the cleaned earthquake data to include only earthquakes in Mexico since the year 2000. It then creates custom annotations for each earthquake, including information about the location, magnitude, and total deaths. These annotations are added to the leaflet map, providing more detailed information when a user interacts with the map.
-eq_clean_data("../inst/extdata/earthquakes.tsv") %>%
+```eq_clean_data("../inst/extdata/earthquakes.tsv") %>%
   eq_location_clean() %>%
   filter(country=="MEXICO" & lubridate::year(date) >= 2000) %>%
   mutate(popup_text =  eq_create_label(.)) %>%
   eq_map(annot_col = "popup_text")
+```
