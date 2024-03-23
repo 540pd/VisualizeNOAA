@@ -158,4 +158,9 @@ annotations for each earthquake, including information about the
 location, magnitude, and total deaths. These annotations are added to
 the leaflet map, providing more detailed information when a user
 interacts with the map.
-`eq_clean_data("../inst/extdata/earthquakes.tsv") %>%   eq_location_clean() %>%   filter(country=="MEXICO" & lubridate::year(date) >= 2000) %>%   mutate(popup_text =  eq_create_label(.)) %>%   eq_map(annot_col = "popup_text")`
+
+    eq_clean_data("../inst/extdata/earthquakes.tsv") %>%
+      eq_location_clean() %>%
+      filter(country=="MEXICO" & lubridate::year(date) >= 2000) %>%
+      mutate(popup_text =  eq_create_label(.)) %>%
+      eq_map(annot_col = "popup_text")
