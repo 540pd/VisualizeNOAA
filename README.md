@@ -4,6 +4,10 @@
 # visualizeNOAA
 
 <!-- badges: start -->
+[![pkgdown](https://github.com/540pd/VisualizeNOAA/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/540pd/VisualizeNOAA/actions/workflows/pkgdown.yaml)
+[![Style](https://github.com/540pd/VisualizeNOAA/actions/workflows/style.yaml/badge.svg)](https://github.com/540pd/VisualizeNOAA/actions/workflows/style.yaml)
+[![test-coverage](https://github.com/540pd/VisualizeNOAA/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/540pd/VisualizeNOAA/actions/workflows/test-coverage.yaml)
+[![R-CMD-check](https://github.com/540pd/VisualizeNOAA/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/540pd/VisualizeNOAA/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 # Introduction
